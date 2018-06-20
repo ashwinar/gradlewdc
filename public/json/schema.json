@@ -1,0 +1,103 @@
+{
+  "tables" : [
+    {
+      "id" : "builds",
+      "alias" : "Builds",
+      "columns" : [
+        { "id" : "bts", "alias" : "Build Timestamp", "dataType" : "int"    },
+        { "id" : "build_id", "alias" : "Build ID", "dataType" : "string"    },
+        { "id" : "user_name", "alias" : "User Name", "dataType" : "string"    },  
+        { "id" : "root_project_name", "alias" : "Root Project Name", "dataType" : "string"    },
+        { "id" : "start", "alias" : "Start Time", "dataType" : "datetime"    },
+        { "id" : "finish", "alias" : "Finish Time", "dataType" : "datetime"    },
+        { "id" : "tags",   "alias" : "Tags", "dataType" : "string" }
+      ],
+      "incrementColumnId" : "bts"
+    },
+    {
+      "id" : "tasks",
+      "alias" : "Tasks",
+      "columns" : [
+        { "id" : "build_id", "alias" : "Build ID", "dataType" : "string", "filterable": true },
+        { "id" : "task_id", "alias" : "Task ID", "dataType" : "string" },
+        { "id" : "path", "alias" : "Path", "dataType" : "string" },
+        { "id" : "type", "alias" : "Type", "dataType" : "string" },
+        { "id" : "duration_millis", "alias" : "Duration (ms)", "dataType" : "int" },
+        { "id" : "outcome", "alias" : "Outcome", "dataType" : "string" }  
+      ],
+      "joinOnly" : true,
+      "foreignKey" : { "tableId": "builds", "columnId": "build_id" }
+    },
+    {
+      "id" : "custom_values",
+      "alias" : "Custom Values",
+      "columns" : [
+        { "id" : "build_id", "alias" : "Build ID", "dataType" : "string", "filterable": true    },
+        { "id" : "key", "alias" : "Key", "dataType" : "string"    },  
+        { "id" : "value", "alias" : "Value", "dataType" : "string"    }  
+      ],
+      "joinOnly" : true,
+      "foreignKey" : { "tableId": "builds", "columnId": "build_id" }
+    },
+    {
+      "id" : "tests",
+      "alias" : "Tests",
+      "columns" : [
+        { "id" : "build_id", "alias" : "Build ID", "dataType" : "string", "filterable": true    },
+        { "id" : "task_id", "alias" : "Task ID", "dataType" : "string"    },
+        { "id" : "test_id", "alias" : "Test ID", "dataType" : "string"    },
+        { "id" : "name", "alias" : "Name", "dataType" : "string"    },
+        { "id" : "class_name", "alias" : "Class Name", "dataType" : "string" },
+        { "id" : "status", "alias" : "Status", "dataType" : "string" },
+        { "id" : "duration_millis", "alias" : "Duration (ms)", "dataType" : "int" }  
+      ],
+      "joinOnly" : true,
+      "foreignKey" : { "tableId": "builds", "columnId": "build_id" }
+    }
+  ],
+    
+  "connections" : [
+    {
+      "alias" : "Builds And Tasks",
+      "tables" : [
+        { "id"    : "builds", "alias" : "Builds" },
+        { "id"    : "tasks", "alias" : "Tasks" }
+      ],
+      "joins" : [
+        {
+          "left" : { "tableAlias" : "Builds", "columnId"   : "build_id" },
+          "right" : { "tableAlias" : "Tasks", "columnId"   : "build_id" },
+          "joinType" : "left"
+        }
+      ]
+    },
+    {
+      "alias" : "Builds And Custom Values",
+      "tables" : [
+        { "id"    : "builds", "alias" : "Builds" },
+        { "id"    : "custom_values", "alias" : "Custom Values"  }
+      ],
+      "joins" : [
+        {
+          "left" : { "tableAlias" : "Builds", "columnId"   : "build_id" },
+          "right" : { "tableAlias" : "Custom Values", "columnId"   : "build_id" },
+          "joinType" : "left"
+        }
+      ]
+    },
+    {
+      "alias" : "Builds And Tests",
+      "tables" : [
+        { "id"    : "builds", "alias" : "Builds" },
+        { "id"    : "tests", "alias" : "Tests" }
+      ],
+      "joins" : [
+        {
+          "left" : { "tableAlias" : "Builds", "columnId"   : "build_id" },
+          "right" : { "tableAlias" : "Tests", "columnId"   : "build_id" },
+          "joinType" : "left"
+        }
+      ]
+    }
+  ]
+}
