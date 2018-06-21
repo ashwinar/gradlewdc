@@ -16,7 +16,7 @@
 
     myConnector.getData = function(table, doneCallback) {
 
-        //    tableau.log("## Connection Data: " + tableau.connectionData);
+        tableau.log("## Connection Data: " + tableau.connectionData);
         var connectionData = JSON.parse(tableau.connectionData);
 
         if (needsJoinFiltering(table.tableInfo.id)) {
@@ -69,7 +69,6 @@ function loadTableData(table, url, startTs, endTs, doneCallback) {
 
         }, false);
     } else {
-        //        tableau.log("## Filter Values ## : " + table.filterValues);
         var filterVals = table.filterValues;
 
         if (filterVals.length == 0) {
@@ -95,7 +94,6 @@ function persistBuildEventsData(baseUrl, table, doneCallback, buildId, buildTs) 
     return new Promise(function(resolve, reject) {
 
         var buildEvts = getBuildEvents(table.tableInfo.id);
-        //        tableau.log("tableId: " + table.tableInfo.id + " " + buildEvts);
         var buildEventPromise = getBuildEventsPromise(baseUrl, table.tableInfo.id, buildId, buildTs, buildEvts);
 
         Promise.all([buildEventPromise]).then(function(data) {
@@ -119,6 +117,8 @@ function getBuildEventsPromise(baseUrl, tableId, buildId, bTimestamp, buildEvent
             if (obj.readyState == 4 && obj.status == "200") {
 
                 var dataArr = obj.responseText.split("\n\n");
+                tableau.log("Number of events: " + dataArr.length + " for buildID: " + buildId);
+                
                 for (var i in dataArr) {
 
                     var evt = dataArr[i].split("\n");
@@ -132,7 +132,6 @@ function getBuildEventsPromise(baseUrl, tableId, buildId, bTimestamp, buildEvent
                         evt[2] = evt[2].replace("data: ", "");
                         var data = JSON.parse(evt[2]);
                         var evtType = data.type.eventType;
-                        //                        tableau.log("EventType: " + evtType + " for buildID: " + buildId);
                         var evtData = data['data'];
                         evtData['timestamp'] = data['timestamp'];
                         if (!evtDataMap.hasOwnProperty(evtType))
@@ -141,7 +140,6 @@ function getBuildEventsPromise(baseUrl, tableId, buildId, bTimestamp, buildEvent
                             evtDataMap[evtType].push(evtData);
                     }
                 }
-                //                tableau.log("evtDataMap: " + JSON.stringify(evtDataMap));
                 resolve(createTableRecords(tableId, buildId, bTimestamp, evtDataMap));
             }
         }
@@ -267,7 +265,6 @@ function createTableRecords(tableId, buildId, bTimestamp, buildEventData) {
         tableData.push(tableEntry);
     }
 
-    //    tableau.log(tableData);
     return tableData;
 }
 
@@ -282,14 +279,6 @@ function getBuildEvents(tableId) {
         case "custom_values":
             return ["UserNamedValue"];
     }
-}
-
-function wait(ms) {
-    return new Promise(function(resolve, reject) {
-        setTimeout(function() {
-            resolve();
-        }, ms);
-    });
 }
 
 function needsJoinFiltering(table) {
