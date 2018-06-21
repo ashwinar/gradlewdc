@@ -29,9 +29,10 @@
 
         var startTsInMs = table.incrementValue ? parseInt(table.incrementValue) + 1 : connectionData.st_timestamp ? connectionData.st_timestamp : new Date(0).getTime();
         var refreshEndTs = startTsInMs + (connectionData.refresh_mins * 60 * 1000);
-        var endTsInMs = connectionData.end_timestamp ? connectionData.end_timestamp : refreshEndTs;
-
-        if (endTsInMs > connectionData.currTs) {
+        var endTsInMs = table.incrementValue ? refreshEndTs : connectionData.end_timestamp ? connectionData.end_timestamp : refreshEndTs;
+        var currTs = new Date().getTime();
+        
+        if (endTsInMs > currTs) {
             tableau.abortWithError("Aborting. Specified end time greater than current timestamp.");
             doneCallback();
             return;
@@ -306,8 +307,7 @@ function setupConnector() {
             "url": url,
             "st_timestamp": st_timestamp ? parsePSTTimeInMs(st_timestamp) : st_timestamp,
             "end_timestamp": end_timestamp ? parsePSTTimeInMs(end_timestamp) : end_timestamp,
-            "refresh_mins": refresh_mins ? parseInt(refresh_mins) : 15,
-            "currTs": new Date().getTime()
+            "refresh_mins": refresh_mins ? parseInt(refresh_mins) : 15
         };
         tableau.connectionData = JSON.stringify(connectionData);
         tableau.submit();
