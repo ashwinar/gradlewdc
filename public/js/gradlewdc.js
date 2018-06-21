@@ -48,7 +48,7 @@
 function loadTableData(table, url, startTs, endTs, doneCallback) {
 
     var buildPromises = [];
-
+    
     if (table.tableInfo.id == "builds") {
         var source = new EventSource(url + '/build-export/v1/builds/since/' + startTs);
         source.addEventListener("Build", function(e) {
@@ -66,6 +66,9 @@ function loadTableData(table, url, startTs, endTs, doneCallback) {
             }
 
             buildPromises.push(persistBuildEventsData(url, table, doneCallback, data["buildId"], data["timestamp"]));
+            if (buildPromises.length % 50 == 0) {
+                tableau.reportProgress("Number of builds loaded: " + buildPromises.length);
+            }
 
         }, false);
     } else {
@@ -79,6 +82,9 @@ function loadTableData(table, url, startTs, endTs, doneCallback) {
 
         for (var i in filterVals) {
             buildPromises.push(persistBuildEventsData(url, table, doneCallback, filterVals[i]));
+            if (i % 50 == 0) {
+                tableau.reportProgress("Number of builds loaded: " + i);
+            }
         }
 
         Promise.all(buildPromises).then(function(data) {
